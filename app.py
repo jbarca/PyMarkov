@@ -1,11 +1,11 @@
 """
 Author: Jacob Barca
 Since: 26/5/20
-Last Modified: 26/5/20
+Last Modified: 27/5/20
 """
 
 import PySimpleGUI as sg
-from markov import TextGenerator as tg
+import markov
 
 
 class Application:
