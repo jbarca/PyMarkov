@@ -57,6 +57,7 @@ def merge_models(models):
 
 	return merged
 
+# Implement update_model() function
 
 def generate_from_token_lists(token_lines, n, count=14, max_iterations=100):
 	pass
