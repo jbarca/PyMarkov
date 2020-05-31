@@ -28,13 +28,13 @@ class Application:
 	def create_window(self):
 		self.window = sg.Window(self.title, self.layout)
 
-	def generate_text(self, text, n, max_iterations):
+	def generate_text(self, text, n, seed=None, max_iterations=100):
 		model = self.current_model
 		if self.text_changed or not self.current_model:
 			model = markov.build_model(text, n)
 			self.current_model = model
 			self.text_changed = False
-		new_text = markov.generate(model, n, None, max_iterations)
+		new_text = markov.generate(model, n, seed, max_iterations)
 		return new_text
 
 	def run(self):
@@ -53,15 +53,19 @@ class Application:
 					if len(values['-D1-']) > 0 and len(values['-IN2-']) > 0:
 						order = int(values['-D1-'])
 						max_iterations = int(values['-IN2-'])
-					text = self.generate_text(values['-IN-'], order, max_iterations)
+					text = self.generate_text(values['-IN-'], order, None, max_iterations)
 					print(text, end='')
 			if event == '-FILE-':
-				text = None
 				with open(values['-FILE-'], 'r') as f:
 					text = f.read()
-				self.window['-IN-'].update(text)
+					self.window['-IN-'].update(text)
 			if event == '-IN-':
 				self.text_changed = True
+				if values['-DG-']:
+					# TODO: Fix dynamic text generation here
+					order = min(1, len(values['-IN-'][:-1]))
+					model = markov.build_model(values['-IN-'][:-1], 1)
+					self.window['-OUTPUT-'].update(model)
 
 			if event == 'Clear':
 				self.window['-OUTPUT-'].update('')
@@ -77,6 +81,7 @@ if __name__ == "__main__":
 						  [sg.Output(size=(100,10), key='-OUTPUT-')],
 						  [sg.Text('Order: '), sg.Drop(values=('2', '3', '4', '5', '6'), auto_size_text=True, key='-D1-')],
 						  [sg.Text('Max iterations: '), sg.Input(key='-IN2-', size=(10, 10))],
+						  [sg.Checkbox('Dynamic generation', default=False, key='-DG-', enable_events=True)],
 						  [sg.Button('Go', key='-B1-'), sg.Button('Clear'), sg.Button('Exit')]])
 	app.create_window()
 
