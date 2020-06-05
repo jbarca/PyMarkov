@@ -1,14 +1,17 @@
 """
 Author: Jacob Barca
 Since: 26/5/20
-Last Modified: 27/5/20
+Last Modified: 5/6/20
 """
 
 # Code obtained from: http://www.decontextualize.com/teaching/rwet/n-grams-and-markov-chains/
 
 import random
 
-
+"""
+Static class that encapsulates the functionality of a Markov Chain Text Generator. Can be used
+to generate a Markov Chain model as well as generate text for a given n-gram based on the model.
+"""
 def build_model(tokens, n):
 	model = dict()
 	if len(tokens) < n:
@@ -72,5 +75,4 @@ def word_level_generate():
 
 
 if __name__ == "__main__":
-	model = build_model("hello world, how are you today? Hello there", 2)
-	print(generate(model, 2, 'he'))
+	pass
