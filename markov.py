@@ -1,7 +1,7 @@
 """
 Author: Jacob Barca
 Since: 26/5/20
-Last Modified: 5/6/20
+Last Modified: 7/6/20
 """
 
 # Code obtained from: http://www.decontextualize.com/teaching/rwet/n-grams-and-markov-chains/
@@ -12,8 +12,11 @@ import random
 Static class that encapsulates the functionality of a Markov Chain Text Generator. Can be used
 to generate a Markov Chain model as well as generate text for a given n-gram based on the model.
 """
-def build_model(tokens, n):
-	model = dict()
+
+
+def build_model(tokens, n, model=None):
+	if not model:
+		model = dict()
 	if len(tokens) < n:
 		return model
 
@@ -59,8 +62,6 @@ def merge_models(models):
 			merged[key].extend(val)
 
 	return merged
-
-# Implement update_model() function
 
 def generate_from_token_lists(token_lines, n, count=14, max_iterations=100):
 	pass

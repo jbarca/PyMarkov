@@ -1,7 +1,7 @@
 """
 Author: Jacob Barca
 Since: 26/5/20
-Last Modified: 5/6/20
+Last Modified: 7/6/20
 """
 
 import PySimpleGUI as sg
@@ -19,6 +19,7 @@ class Application:
 		self.title = title
 		self.text_changed = False
 		self.current_model = None
+		self.current_text = ""
 		if theme:
 			self.set_theme(theme)
 
@@ -61,9 +62,10 @@ class Application:
 					self.window['-OUTPUT-'].print(text, end='')
 			if event == '-FILE-':
 				# Opens a file to read into the input box
-				with open(values['-FILE-'], 'r') as f:
-					text = f.read()
-					self.window['-IN-'].update(text)
+				if values['-FILE-']:
+					with open(values['-FILE-'], 'r') as f:
+						text = f.read()
+						self.window['-IN-'].update(text)
 			if event == '-IN-':
 				self.text_changed = True
 				# Autocomplete like feature that allows dynamic text generation based on
@@ -75,11 +77,13 @@ class Application:
 						order = int(values['-D1-'])
 						max_iterations = int(values['-IN2-'])
 					order = min(order, len(values['-IN-'][:-1]))
-					model = markov.build_model(values['-IN-'][:-1], order)
+					# TODO: Add dynamic model updating when user types in new text
+					model = markov.build_model(values['-IN-'][:-1], order, self.current_model)
 					new_text = markov.generate(model, order, values['-IN-'][-order-1:-1], max_iterations)
 					self.window['-OUTPUT-'].update('')
 					self.window['-OUTPUT-'].print(values['-IN-'][:-1], end='')
 					self.window['-OUTPUT-'].print(new_text[order:], text_color='white', background_color='red', end='')
+					self.current_text = values['-IN-'][:-1]
 
 			if event == 'Clear':
 				# Clear the output box
@@ -90,10 +94,10 @@ class Application:
 
 if __name__ == "__main__":
 	app = Application('Markov Chain', 'Default1')
-	app.add_layout_items([[sg.Text('Enter text below to be used in the text generation:')],
+	app.add_layout_items([[sg.Text('Enter text below to be used in the text generation, or read in a text file:')],
 						  [sg.Text('File to open: '), sg.Input(key='-FILE-', enable_events=True), sg.FileBrowse(file_types=(("Text Files", "*.txt"),))],
 						  [sg.Multiline('', key='-IN-', size=(100, 10), enable_events=True)],
-						  [sg.MLine(size=(100,10), key='-OUTPUT-')],
+						  [sg.MLine(size=(100,10), key='-OUTPUT-', disabled=True)],
 						  [sg.Text('Order: '), sg.Drop(values=('2', '3', '4', '5', '6'), auto_size_text=True, key='-D1-')],
 						  [sg.Text('Max iterations: '), sg.Input(key='-IN2-', size=(10, 10))],
 						  [sg.Checkbox('Dynamic generation', default=False, key='-DG-', enable_events=True)],
